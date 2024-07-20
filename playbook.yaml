@@ -1,8 +1,33 @@
 ---
-- name: Install and Configure Jenkins, docker and kubernetes
+- name: Install and Configure Jenkins, docker and kubernetes on Master Node
   hosts: react
   become: yes
   roles:
-    #- jenkins
+    # - jenkins
     #- docker
     - kubernetes-master
+  tasks:
+    - name: Fetch the join command from the Master Node
+      fetch: 
+        src: /home/react/join_command.sh
+        dest: /tmp/join_command.sh
+        flat: yes
+    - name: Add user react to the docker group
+      user:
+        name: react
+        group: docker
+- name: Copy the Join command to the Worker Node
+  hosts: worker-node
+  become: yes
+  roles:
+    - docker
+    - kubernetes-worker
+  tasks:
+    - name: Copy the Join command to the Worker Node
+      copy:
+        src: /tmp/join_command.sh
+        dest: /home/worker-node/join_command.sh
+    - name: Add user worker-node to the docker group
+      user:
+        name: worker-node
+        group: docker
