@@ -1,0 +1,73 @@
+---
+# Enable systemd as the Cgroup manager for the containerd using shell script
+- name: Copy the Shell Script to the remote host
+  copy:
+    src: /home/ansible/ansible/systemd_cgroup.sh
+    dest: /home/react/systemd_cgroup.sh
+    mode: '0755'
+- name: Enable systemd as the Cgroup manager in the containerd config file
+  shell: ./systemd_cgroup.sh
+  args:
+    chdir: /home/react/
+# kubelet will not start on the Master node if the swap is enabled, so we are removing any swap entries in fstab file and disabling swap
+- name: Unmount swap filesystems
+  mount:
+    path: /mnt
+    state: absent
+    fstype: swap
+- name: Disable swap
+  command: swapoff -a
+- name: Install packages that allow apt to be used over HTTPS
+  apt:
+      name: "{{ packages }}"
+      state: present
+      update_cache: yes
+# - name: Download the public signing key for the Kubernetes package repositories.
+#   get_url:
+#     url: "{{ repo_url }}"
+#     dest: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+- name: Download the public signing key for the Kubernetes package repositories.
+  shell:
+    cmd: curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+- name: Add the 1.30 Kubernetes apt repository
+  apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /"
+    state: present
+    filename: kubernetes
+- name: Install Kubelet, Kubeadm and Kubectl on Master Node
+  apt:
+    name: "{{ k8s_packages }}"
+    state: present
+    update_cache: yes
+- name: Pin the K8s binaries at 1.30
+  command: apt-mark hold kubelet kubeadm kubectl
+- name: Start and Enable the Kubelet service
+  systemd: 
+    name: kubelet
+    enabled: yes
+    state: started
+- name: Enable Container Runtime containerd
+  command: sudo sed -i 's/disabled_plugins/enabled_plugins/g' /etc/containerd/config.toml
+- name: Restart Containerd
+  systemd: 
+    name: containerd
+    state: restarted
+#- name: Initialize the Kubernetes Cluster using kubeadm
+# command: kubeadm init
+# kubeadm command generates admin.conf file and does pre-flight checks if the master node is suitable for running the cluster.
+- name: Setup the kube config file for the react user to access the Kubernetes cluster 
+  shell: |
+    mkdir -p /home/react/.kube
+    touch /home/react/.kube/config
+    cp /etc/kubernetes/admin.conf /home/react/.kube/config
+    chown react:react /home/react/.kube/config
+- name: Setup the Container Networking Interface Plugin Calico
+  become: false
+  command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/tigera-operator.yaml
+# Generate kube join command for joining the node to the Kubernetes cluster
+- name: Generate kube join command and store the output in a file
+  command: kubeadm token create --print-join-command
+  register: join_command
+- name: Copy the std out of the join command to a file
+  shell: echo "{{ join_command.stdout }}" > /home/react/join_command

@@ -1,0 +1,27 @@
+---
+- name: Add an apt signing key for Docker
+  get_url:
+      url: "{{ key_url }}"
+      dest: /etc/apt/keyrings/docker.asc
+- name: Add Docker repository to the Apt sources
+  apt_repository:
+    repo: 'deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu jammy stable/'
+    state: present
+    filename: docker
+- name: Upgrade all the installed packages to the latest versions
+  shell: apt upgrade -y
+- name: Install Docker and its Dependencies
+  apt:
+    name: "{{ docker_packages }}"
+    state: present
+    update_cache: yes
+- name: Add user react to the docker group
+  user:
+    name: react
+    group: docker
+- name: Start and enable Docker
+  systemd:
+    name: docker
+    enabled: yes
+    state: started
+

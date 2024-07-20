@@ -1,0 +1,8 @@
+---
+- name: Install and Configure Jenkins, docker and kubernetes
+  hosts: react
+  become: yes
+  roles:
+    #- jenkins
+    #- docker
+    - kubernetes-master
