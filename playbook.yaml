@@ -2,11 +2,18 @@
 - name: Install and Configure Jenkins, docker and kubernetes on Master Node
   hosts: react
   become: yes
+  vars:
+    - dest: /home/ansible/ansible/
   roles:
     - jenkins
     - docker
     - kubernetes-master
   tasks:
+    - name: Fetch files from github
+      git:
+        repo: 'https://github.com/Noorunnsa/React-App.git'
+        dest: "{{ dest }}"
+        force: yes
     - name: Fetch the join command from the Master Node
       fetch: 
         src: /home/react/join_command.sh
