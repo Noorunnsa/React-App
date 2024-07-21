@@ -64,7 +64,7 @@
     chown react:react /home/react/.kube/config
 #- name: Setup the Container Networking Interface Plugin Calico
 #  become: false
-#  command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/tigera-operator.yaml
+#  command: kubectl apply -f https://reweave.azurewebsites.net/k8s/v1.30/net.yaml
 # Generate kube join command for joining the node to the Kubernetes cluster
 - name: Generate kube join command and store the output in a variable
   command: kubeadm token create --print-join-command
