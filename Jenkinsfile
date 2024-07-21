@@ -38,7 +38,7 @@ pipeline {
              // sh "sed -i "s|noorunnisa/react-app:[^ ]*|noorunnisa/react-app:${BUILD_NUMBER}|" manifests/deployment.yaml"
               // sh "sed -i 's/noorunnisa/react-app:[^ ]*/noorunnisa/react-app:${BUILD_NUMBER}/' manifests/deployment.yaml"
               sh "sed -i 's|noorunnisa/react-app:[^ ]*|noorunnisa/react-app:${BUILD_NUMBER}|' ./manifests/deployment.yaml"
-              sh 'cat ./manifests/deployment.yml'
+              sh 'cat ./manifests/deployment.yaml'
             }
         }
         stage('Deploy to Kubernetes') {
