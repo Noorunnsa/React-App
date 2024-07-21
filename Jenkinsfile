@@ -44,7 +44,7 @@ passwordVariable: 'DOCKERHUB_PASSWORD')]) {
                     // Deploy to Kubernetes using manifests from the repository
                     withCredentials([file(credentialsId: KUBECONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
                         sh 'kubectl apply -f ./manifests/deployment.yaml'
-                        sh 'kubectl apply -f ./manifests/service.yaml'
+                        sh 'kubectl apply -f ./manifests/ingress.yaml'
                     }
                 }
             }
