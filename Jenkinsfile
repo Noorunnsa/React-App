@@ -36,7 +36,8 @@ passwordVariable: 'DOCKERHUB_PASSWORD')]) {
            steps {
             // sh "sed -i -e 's%noorunnisa/react-app:.*%noorunnisa/react-app:${BUILD_NUMBER}%g' manifests/deployment.yml"
              // sh "sed -i "s|noorunnisa/react-app:[^ ]*|noorunnisa/react-app:${BUILD_NUMBER}|" manifests/deployment.yaml"
-              sh "sed -i 's/noorunnisa/react-app:[^ ]*/noorunnisa/react-app:${BUILD_NUMBER}/' manifests/deployment.yaml"
+              // sh "sed -i 's/noorunnisa/react-app:[^ ]*/noorunnisa/react-app:${BUILD_NUMBER}/' manifests/deployment.yaml"
+              sh "sed -i 's|noorunnisa/react-app:[^ ]*|noorunnisa/react-app:${BUILD_NUMBER}|' manifests/deployment.yaml"
               sh 'cat manifests/deployment.yml'
             }
         }
