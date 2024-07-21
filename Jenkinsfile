@@ -13,19 +13,12 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
+          sh "docker rm 
           sh "docker build -t noorunnisa/react-app:${BUILD_NUMBER} ."
           sh "docker images"
           sh "sleep 10"
             }
         }
-        stage('Test Docker Image') {
-      steps {
-          sh "docker run -d -p 8082:80 --name react-app noorunnisa/react-app:${BUILD_NUMBER}"
-          sh "sleep 10"
-          sh "docker rm -f react-app"
-          sh "echo testing complete"
-        }
-      }
       stage('Login to DockerHub and Push Docker Image') {
             steps {
                 script {
