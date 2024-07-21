@@ -3,8 +3,8 @@
   hosts: react
   become: yes
   roles:
-    # - jenkins
-    #- docker
+    - jenkins
+    - docker
     - kubernetes-master
   tasks:
     - name: Fetch the join command from the Master Node
@@ -16,7 +16,7 @@
       user:
         name: react
         group: docker
-- name: Copy the Join command to the Worker Node
+- name: Install and configure Docker and Kubernetes and Copy the join command
   hosts: worker-node
   become: yes
   roles:
