@@ -3,8 +3,14 @@ kind: Ingress
 metadata:
   name: react-app-ingress
 spec:
-  defaultBackend:
-    service:
-      name: react-app-service
-      port:
-        number: 80
+  rules:
+  - host: react-app.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: react-app-service
+            port:
+              number: 80
