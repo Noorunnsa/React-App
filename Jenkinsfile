@@ -3,7 +3,7 @@ pipeline {
     environment {
         // Define Docker Hub credentials ID stored in Jenkins credentials store
         DOCKERHUB_CREDENTIALS = "dockerHubCredentials"
-        KUBE_CONFIG = "kubeconfig"
+        KUBECONFIG_CREDENTIALS_ID = "kubeconfig"
     }
     stages {
         stage('Checkout main branch') {
@@ -34,9 +34,6 @@ pipeline {
 //         }
         stage('modify manifest tag') {
            steps {
-            // sh "sed -i -e 's%noorunnisa/react-app:.*%noorunnisa/react-app:${BUILD_NUMBER}%g' manifests/deployment.yml"
-             // sh "sed -i "s|noorunnisa/react-app:[^ ]*|noorunnisa/react-app:${BUILD_NUMBER}|" manifests/deployment.yaml"
-              // sh "sed -i 's/noorunnisa/react-app:[^ ]*/noorunnisa/react-app:${BUILD_NUMBER}/' manifests/deployment.yaml"
               sh "sed -i 's|noorunnisa/react-app:[^ ]*|noorunnisa/react-app:${BUILD_NUMBER}|' ./manifests/deployment.yaml"
               sh 'cat ./manifests/deployment.yaml'
             }
@@ -45,7 +42,7 @@ pipeline {
             steps {
                 script {
                     // Deploy to Kubernetes using manifests from the repository
-                    withKubeConfig([credentialsId: 'kubeconfig']) {
+                    withCredentials([file(credentialsId: KUBECONFIG_CREDENTIALS_ID, variable: 'kubeconfig')]) {
                         sh 'kubectl apply -f ./manifests/deployment.yaml'
                     }
                 }
