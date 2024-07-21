@@ -13,7 +13,6 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-          sh "docker rm 
           sh "docker build -t noorunnisa/react-app:${BUILD_NUMBER} ."
           sh "docker images"
           sh "sleep 10"
