@@ -42,7 +42,7 @@ pipeline {
             steps {
                 script {
                     // Deploy to Kubernetes using manifests from the repository
-                    withCredentials([file(credentialsId: KUBECONFIG_CREDENTIALS_ID, variable: 'kubeconfig')]) {
+                    withCredentials([file(credentialsId: KUBECONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
                         sh 'kubectl apply -f ./manifests/deployment.yaml'
                     }
                 }
