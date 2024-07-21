@@ -20,7 +20,7 @@ pipeline {
         }
         stage('Test Docker Image') {
       steps {
-          sh "docker run -d -p 8080:80 --name react-app noorunnisa/react-app:${BUILD_NUMBER}"
+          sh "docker run -d -p 8082:80 --name react-app noorunnisa/react-app:${BUILD_NUMBER}"
           sh "sleep 10"
           sh "docker rm -f react-app"
           sh "echo testing complete"
