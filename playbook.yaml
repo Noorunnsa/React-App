@@ -28,9 +28,9 @@
       user:
         name: worker-node
         group: docker
-     - name: Copy the Join command to the Worker Node
+    - name: Copy the Join command to the Worker Node
       copy:
         src: /tmp/join_command.sh
         dest: /home/worker-node/join_command.sh
     - name: Install kubelet, kubectl and kubeadm
-      include-tasks: kubernetes-worker.yaml
+      include_tasks: kubernetes-worker.yaml
