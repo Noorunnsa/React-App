@@ -11,6 +11,23 @@ pipeline {
                 checkout([$class: 'GitSCM', branches: [[name: 'origin/main']], userRemoteConfigs: [[url: 'https://github.com/Noorunnsa/React-App.git']]])
             }
         }
+        stage('SonarQube Analysis') {
+         steps {
+             script {
+                 def scannerHome = tool 'SonarQubeScanner'
+                 withSonarQubeEnv('sonarqube') {
+                   sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=Sonar_Jenkins -Dsonar.host.url=http://3.110.122.47:9000/ -Dsonar.login=sqp_9f184c9b6ac6e5e240ece3a186c091c5f8e56835"
+                 }
+               }
+            }
+        }
+     stage("Quality Gate") {
+       steps {
+               timeout(time: 5, unit: 'MINUTES') {
+                 waitForQualityGate abortPipeline: true
+             }
+         }
+     }
         stage('Build Docker Image') {
             steps {
           sh "docker build -t noorunnisa/react-app:${BUILD_NUMBER} ."
