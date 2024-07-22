@@ -1,2 +1,0 @@
-react ansible_host=13.234.238.164 ansible_user=react ansible_ssh_pass=react ansible_port=22 ansible_become_pass=react
-worker-node ansible_host=52.66.191.102 ansible_user=worker-node ansible_ssh_pass=worker-node ansible_port=22 ansible_become_pass=worker-node
