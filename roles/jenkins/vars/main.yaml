@@ -1,9 +1,0 @@
----
-java: "openjdk-17-jdk"
-jenkins_repo_url: "https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key"
-packages:
- - apt-transport-https
- - ca-certificates
- - curl
- - gnupg-agent
- - software-properties-common
