@@ -2,7 +2,7 @@
 # Enable systemd as the Cgroup manager for the containerd using shell script
 - name: Copy the Shell Script to the remote host
   copy:
-    src: /home/ansible/ansible/React-App/systemd_cgroup.sh
+    src: /home/ansible/React-App/Playbooks/systemd_cgroup.sh
     dest: /home/worker-node/systemd_cgroup.sh
     mode: '0755'
 - name: Enable systemd as the Cgroup manager in the containerd config file
