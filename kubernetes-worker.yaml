@@ -1,0 +1,62 @@
+---
+# Enable systemd as the Cgroup manager for the containerd using shell script
+- name: Copy the Shell Script to the remote host
+  copy:
+    src: /home/ansible/ansible/React-App/systemd_cgroup.sh
+    dest: /home/worker-node/systemd_cgroup.sh
+    mode: '0755'
+- name: Enable systemd as the Cgroup manager in the containerd config file
+  shell: ./systemd_cgroup.sh
+  args:
+    chdir: /home/worker-node/
+# kubelet will not start on the Master node if the swap is enabled, so we are removing any swap entries in fstab file and disabling swap
+- name: Unmount swap filesystems
+  mount:
+    path: /mnt
+    state: absent
+    fstype: swap
+- name: Disable swap
+  command: swapoff -a
+- name: Install packages that allow apt to be used over HTTPS
+  apt:
+      name: "{{ packages }}"
+      state: present
+      update_cache: yes
+# - name: Download the public signing key for the Kubernetes package repositories.
+#   get_url:
+#     url: "{{ repo_url }}"
+#     dest: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+- name: Download the public signing key for the Kubernetes package repositories.
+  shell:
+    cmd: curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+- name: Add the 1.30 Kubernetes apt repository
+  apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /"
+    state: present
+    filename: kubernetes
+- name: Install Kubelet, Kubeadm and Kubectl on Master Node
+  apt:
+    name: "{{ k8s_packages }}"
+    state: present
+    update_cache: yes
+- name: Pin the K8s binaries at 1.30
+  command: apt-mark hold kubelet kubeadm kubectl
+- name: Start and Enable the Kubelet service
+  systemd:
+    name: kubelet
+    enabled: yes
+    state: started
+- name: Enable Container Runtime containerd
+  command: sudo sed -i 's/disabled_plugins/enabled_plugins/g' /etc/containerd/config.toml
+- name: Restart Containerd
+  systemd:
+    name: containerd
+    state: restarted
+- name: Provide execute permissions to the join_command file
+  command: chmod +x /home/worker-node/join_command.sh
+- name: Run the join command to join the K8s cluster
+  shell: ./join_command.sh
+  args:
+    chdir: /home/worker-node/
+    executable: /bin/bash
