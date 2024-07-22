@@ -1,5 +1,4 @@
 ELK/
 manifests/
-*.sh
-*.yaml
+Playbooks/
 Jenkinsfile
