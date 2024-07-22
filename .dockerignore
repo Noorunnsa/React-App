@@ -1,0 +1,5 @@
+ELK/
+manifests/
+*.sh
+*.yaml
+Jenkinsfile
