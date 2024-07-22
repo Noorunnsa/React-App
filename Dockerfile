@@ -21,17 +21,14 @@ RUN npm cache clean --force
 COPY . /app/
 
 # Step 6: Build application
-# RUN docker build . -t chrisjoonlee/deep-dive-node-only
 RUN npm run build
 
 # Step 7: Bring in the base image for NGINX (alpine)
 FROM nginx:stable-alpine
 
-# (There will be no need to EXPOSE a port because this base image
-# already has an EXPOSE command)
+# (There will be no need to EXPOSE a port because this base image already has an EXPOSE command)
 
 # Step 8: Set working directory to the html folder for nginx
-#   (Hint: This directory was also used in phase 1)
 WORKDIR /usr/share/nginx/html
 
 # Step 9: Copy over the build files from build-stage
