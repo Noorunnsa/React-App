@@ -53,8 +53,8 @@
   systemd:
     name: containerd
     state: restarted
-# - name: Initialize the Kubernetes Cluster using kubeadm
-#  command: kubeadm init
+- name: Initialize the Kubernetes Cluster using kubeadm
+ command: kubeadm init
 # kubeadm command generates admin.conf file and does pre-flight checks if the master node is suitable for running the cluster.
 - name: Setup the kube config file for the react user to access the Kubernetes cluster
   shell: |
@@ -62,16 +62,12 @@
     touch /home/react/.kube/config
     cp /etc/kubernetes/admin.conf /home/react/.kube/config
     chown react:react /home/react/.kube/config
-#- name: Setup the Container Networking Interface Plugin Calico
-#  become: false
-#  command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/tigera-operator.yaml
+- name: Setup the Container Networking Interface Plugin Weave Net
+ become: false
+ command: kubectl apply -f https://reweave.azurewebsites.net/k8s/v1.29/net.yaml
 # Generate kube join command for joining the node to the Kubernetes cluster
 - name: Generate kube join command and store the output in a variable
   command: kubeadm token create --print-join-command
   register: join_command
 - name: Copy the std out of the join command to a file
   shell: echo "{{ join_command.stdout }}" > /home/react/join_command.sh
-#- name: Copy file to worker host using SCP
-#  command: scp /home/react/join_command worker-node@13.232.39.205:/home/worker-node/join_command.sh
-- name: Remove taints from the nodes
-  command: kubectl taint nodes --all node.kubernetes.io/not-ready-
